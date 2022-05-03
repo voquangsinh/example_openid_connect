@@ -41,4 +41,26 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the UserProfile associated with the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function UserProfile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id');
+    }
+
+    /**
+     * Get the user's avarta.
+     *
+     * @param  string  $value
+     *
+     * @return string
+     */
+    public function getAvatarAttribute()
+    {
+        return $this->userProfile->avatar ?? asset('image/default.jpg');
+    }
 }
