@@ -16,9 +16,11 @@ class CreateOpenidConnectInfomationTable extends Migration
         Schema::create('openid_connect_infomation', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned();
+            $table->string('provider');
             $table->string('access_token');
             $table->string('token_type', 10);
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

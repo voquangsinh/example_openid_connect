@@ -12,4 +12,14 @@ class OpenidConnectInfomation extends Model
     protected $table = 'openid_connect_infomation';
 
     protected $guarded = [];
+
+    /**
+     * Get the user that owns the OpenidConnectInfomation
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

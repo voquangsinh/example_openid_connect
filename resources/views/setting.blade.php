@@ -53,6 +53,7 @@
             </div>
         </div>
     </div>
+
     @php
     $class = 'bg-blue-800';
     @endphp
@@ -61,6 +62,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     CONNECTION
+
                     <form method="GET" action="https://accounts.google.com/o/oauth2/v2/auth">
                         @foreach ($params as $type => $param)
                         <input type="hidden" name="{{ $type }}" value="{{ $param }}">
@@ -72,6 +74,7 @@
                             </x-button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>

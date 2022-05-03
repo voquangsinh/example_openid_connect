@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\GoogleOpenIdConnectService;
+use App\Core\Actions\GoogleOpenIdConnectAction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
@@ -51,6 +52,8 @@ class GoogleOpenIdConnectController extends Controller
         if ($state !== Redis::get('state_' . $userId)) {
             return;
         }
-        $result = app(GoogleOpenIdConnectService::class)->requestToken($userId, $params['code']);
+        $result = app(GoogleOpenIdConnectAction::class)->requestToken($userId, $params['code']);
+        $user = User::find($userId);
+        return view('setting', ['auth' => $user]);
     }
 }
