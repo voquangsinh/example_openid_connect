@@ -24,7 +24,7 @@
                     <x-slot name="trigger">
                         <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
                             {{-- Avatar --}}
-                            <img src="{{ Auth::user()->avatar }}" class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white mr-2">
+                            <img src="{{ Auth::user()->userProfile->avatar ?? asset('image/default.jpg') }}" class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white mr-2">
 
                             <div>{{ Auth::user()->name }}</div>
 
