@@ -8,6 +8,8 @@ class GoogleProviderRequest extends BaseExternalRequest
 
     protected $params;
 
+    protected $method;
+
     /**
      * Set params request
      *
@@ -45,6 +47,29 @@ class GoogleProviderRequest extends BaseExternalRequest
     }
 
     /**
+     * Set uri
+     *
+     * @param string $uri uri
+     * 
+     * @return this
+     */
+    public function setMethod(string $method)
+    {
+        $this->method = $method;
+        return $this;
+    }
+
+    /**
+     * Get methid
+     *
+     * @return string
+     */
+    public function getMethod(): string
+    {
+        return strtoupper($this->method);
+    }
+
+    /**
      * Get header request
      *
      * @return array
@@ -61,7 +86,7 @@ class GoogleProviderRequest extends BaseExternalRequest
      */
     public function handleRequest(): array
     {
-        return ['body' => $this->params];
+        return ['form_params' => $this->params];
     }
 
     /**

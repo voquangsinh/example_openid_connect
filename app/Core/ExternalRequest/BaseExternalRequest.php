@@ -24,6 +24,13 @@ abstract class BaseExternalRequest
      * @return string
      */
     abstract protected function getUri(): string;
+
+    /**
+     * Get method
+     *
+     * @return string
+     */
+    abstract protected function getMethod(): string;
     
     /**
      * Get header
@@ -59,13 +66,13 @@ abstract class BaseExternalRequest
     abstract protected function handleResponse(array $res): array;
 
 
-    public function call(string $method, string $path): array
+    public function call(): array
     {
         $client = new Client([
             'base_uri' => $this->getBaseUri(),
             'headers' => $this->getHeaders(),
         ]);
-        $res = $client->request($method, $path, $this->getBody());
+        $res = $client->request($this->getMethod(), $this->getUri(), $this->getBody());
         $data = $res->getBody()->getContents();
 
         return $this->handleResponse(json_decode($data, true));
