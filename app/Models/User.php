@@ -61,16 +61,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(OpenidConnectInfomation::class, 'user_id');
     }
-
-    /**
-     * Get the user's avarta.
-     *
-     * @param  string  $value
-     *
-     * @return string
-     */
-    public function getAvatarAttribute()
-    {
-        return $this->userProfile->avatar ?? asset('image/default.jpg');
-    }
 }

@@ -32,14 +32,14 @@ class GoogleOpenIdConnectAction
                 ->call();
 
         $claims = json_decode(base64_decode(explode(".", $res['id_token'])[1]));
-
         if (! $this->checkValidNonce($claims->nonce)) {
             return false;
         }
 
-        $userProfile = app(UserProfileAction::class)->createUserProfile(['user_id' => explode('.', $claims->nonce)[0], 'avatar' => $claims->picture]);
-        $openidInfo = app(OpenidConnectInfomationAction::class)->createOpenidInfomation([
+        app(UserProfileAction::class)->createUserProfile(['user_id' => explode('.', $claims->nonce)[0], 'avatar' => $claims->picture]);
+        app(OpenidConnectInfomationAction::class)->createOpenidInfomation([
             'user_id' => explode('.', $claims->nonce)[0],
+            'provider' => 'google',
             'access_token' => $res['access_token'],
             'token_type' => $res['token_type']
         ]);
@@ -57,24 +57,45 @@ class GoogleOpenIdConnectAction
     public function checkValidNonce($nonce): bool
     {
         list($userId, $nonce) = explode('.', $nonce);
-        return $nonce === Redis::get('nonce_' . $userId);
+        return $nonce === Redis::get('none_google_' . $userId);
     }
 
     /**
      * Get params connect
      *
+     * @param User $user user id
+     *
      * @return array
      */
-    public function getParamsConnect(int $userId = 0): array
+    public function getParamsConnect($user): array
     {
-        $userId = $userId ?? Auth::user()->id;
-        $state = Str::random(30);
-        $none = Str::random(30);
-
-        Redis::set('state_' . $userId, $state, 'EX', 300);
-        Redis::set('nonce_' . $userId, $none, 'EX', 300);
+        $conditions = function($query) use ($user) {
+            return $query->where('user_id', $user->id)
+                ->whereIn('provider', array_keys(config('oidc')));
+        };
+        $isConnectedProvider = app(OpenidConnectInfomationAction::class)->getOpenidInfomationByCondition($conditions)->pluck('provider')->toArray();
 
         $params = [
+            'google' => $this->getParamGoogle($user->id),
+        ];
+
+        return [$isConnectedProvider, $params];
+    }
+
+    /**
+     * Get param google
+     *
+     * @param int $userId user id
+     *
+     * @return array
+     */
+    public function getParamGoogle($userId)
+    {
+        $state = Str::random(30);
+        $none = Str::random(30);
+        Redis::set('state_google_' . $userId, $state, 'EX', 300);
+        Redis::set('none_google_' . $userId, $none, 'EX', 300);
+        return [
             'client_id' => config('oidc.google.client_id'),
             'response_type' => 'code',
             'scope' => 'profile',
@@ -83,7 +104,5 @@ class GoogleOpenIdConnectAction
             'nonce' => implode('.', [$userId, $none]),
             'display' => 'popup',
         ];
-
-        return $params;
     }
 }
