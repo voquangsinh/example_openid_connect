@@ -3,7 +3,6 @@
 namespace App\Core\Actions;
 
 use App\Core\ExternalRequest\GoogleProviderRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 
@@ -33,18 +32,22 @@ class GoogleOpenIdConnectAction
 
         $claims = json_decode(base64_decode(explode(".", $res['id_token'])[1]));
         if (! $this->checkValidNonce($claims->nonce)) {
-            return false;
+            throw new \Exception('Invalid noncce', 500);
+        }
+        if ($this->checkExistSub([['sub', $claims->sub, ['provider', 'google']]])) {
+            throw new \Exception('Email connect exists', 500);
         }
 
         app(UserProfileAction::class)->createUserProfile(['user_id' => explode('.', $claims->nonce)[0], 'avatar' => $claims->picture]);
         app(OpenidConnectInfomationAction::class)->createOpenidInfomation([
             'user_id' => explode('.', $claims->nonce)[0],
             'provider' => 'google',
+            'sub' => $claims->sub,
             'access_token' => $res['access_token'],
             'token_type' => $res['token_type']
         ]);
 
-        return true;
+        return;
     }
 
     /**
@@ -58,6 +61,18 @@ class GoogleOpenIdConnectAction
     {
         list($userId, $nonce) = explode('.', $nonce);
         return $nonce === Redis::get('none_google_' . $userId);
+    }
+
+    /**
+     * Check exists sub
+     *
+     * @param array $conditions conditions
+     *
+     * @return bool
+     */
+    public function checkExistSub(array $conditions): bool
+    {
+        return (bool) app(OpenidConnectInfomationAction::class)->getOpenidInfomationByCondition($conditions)->count();
     }
 
     /**
