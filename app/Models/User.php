@@ -41,4 +41,24 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the UserProfile associated with the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function userProfile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id');
+    }
+
+    /**
+     * Get all of the openidinformations for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function openidInformations()
+    {
+        return $this->hasMany(OpenidConnectInfomation::class, 'user_id');
+    }
 }
