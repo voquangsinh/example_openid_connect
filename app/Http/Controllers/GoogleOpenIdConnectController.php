@@ -36,8 +36,9 @@ class GoogleOpenIdConnectController extends Controller
         $params = $request->all();
         list($userId, $state) = explode('.', $params['state']);
         if ($state !== Redis::get('state_google_' . $userId)) {
-            return;
+            return redirect(route('setting'));
         }
+
         try {
             app(GoogleOpenIdConnectAction::class)->requestToken($userId, $params['code']);
             return redirect(route('setting'));
