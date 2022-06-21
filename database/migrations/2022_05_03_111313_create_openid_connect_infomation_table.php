@@ -17,6 +17,7 @@ class CreateOpenidConnectInfomationTable extends Migration
             $table->id();
             $table->bigInteger('user_id')->unsigned();
             $table->string('provider');
+            $table->string('sub');
             $table->string('access_token');
             $table->string('token_type', 10);
             $table->timestamps();
